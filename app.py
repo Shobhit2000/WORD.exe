@@ -94,7 +94,6 @@ def angleSet(angle,pin):
     GPIO.output(pin,False)
     servo.ChangeDutyCycle(duty)
     servo.stop()
-    GPIO.cleanup()
 
 
 # Load TFLite model and allocate tensors.
