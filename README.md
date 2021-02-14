@@ -9,6 +9,8 @@ We have come up with an idea that can eliminate this problem by using the remote
 ## How I built it
 The major attraction of our project is the remote access controlled robot with an auto-aim feature based on a deep learning mechanism. Firstly we have built the CAD model for our robot which is designed to run on any kind of terrain and at the same time incorporating the gun which is an automatic aim assist robot. The auto-aim feature has been implemented based on the deep learning concept which is designed to detect guns in its view using Convolutional Neural Networks which takes in the live video feed using the RPi camera and returns the bounding box coordinates from which we can find the region of interest which tells the gun to focus at that particular point that is at the weapon thereby disarming the terrorist so that the military or police can take control thereon. The gun is mounted on the top of the robot through servo motors which are controlled incorporating the feedback loop using PID and Stanley controller. Irrespective of the movement of the robot and auto-aim gun can fire in any direction when it detects terrorists with guns. 
 
+Link to Fusion 360 model :- https://a360.co/3qrq1cM
+
 ## Challenges I ran into
 * Completing the hardware part of the project as all the hardware components were with only one member.
 * Integrating the Deep Learning model in Raspberry pi taking into consideration the computation power of the microprocessor.
