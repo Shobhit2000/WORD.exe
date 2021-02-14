@@ -5,9 +5,11 @@ Created on Tue Aug 18 16:23:16 2020
 """
 
 import numpy as np
-import tensorflow as tf
+import tflite_runtime.interpreter as tflite
 import cv2
 import PIL.ImageDraw as ImageDraw
+import RPi.GPIO as GPIO
+from time import sleep
 
 def create_category_index(label_path='coco_ssd_mobilenet/labelmap.txt'):
     """
@@ -176,13 +178,36 @@ def make_and_show_inference(img, interpreter, input_details, output_details, cat
     line_thickness=3'''
     return p1, p2
 
+def angleSet(angle,pin):
+    servo=GPIO.PWM(pin,50)
+    servo.start(0)
+    duty=angle/18+2
+    GPIO.output(pin,True)
+    servo.ChangeDutyCycle(duty)
+    sleep(1)
+    GPIO.output(pin,False)
+    servo.ChangeDutyCycle(duty)
+    servo.stop()
+    GPIO.cleanup()
+
+
 # Load TFLite model and allocate tensors.
-interpreter = tf.lite.Interpreter(model_path="coco_ssd_mobilenet/detect.tflite")
+interpreter = tflite.Interpreter(model_path="coco_ssd_mobilenet/detect.tflite")
 interpreter.allocate_tensors()
 
 # Get input and output tensors.
 input_details = interpreter.get_input_details()
 output_details = interpreter.get_output_details()
+
+GPIO.setmode(GPIO.BOARD)
+servo_pitch=40
+servo_yaw=38
+GPIO.setup(servo_pitch, GPIO.OUT)
+GPIO.setup(servo_yaw, GPIO.OUT)
+currrent_pitch=90
+current_yaw=90
+angleSet(currrent_pitch,servo_pitch)
+angleSet(current_yaw,servo_yaw)
 
 category_index = create_category_index()
 input_shape = input_details[0]['shape']
@@ -198,6 +223,27 @@ while(True):
         img = cv2.rectangle(img, (int(p1[0]), int(p1[1])), (int(p2[0]), int(p2[1])), (255, 0, 0) , 2)
         
         cv2.imshow("image", img)
+
+        if p1[0]<320 and p2[0]>320:
+            print("Horizontal target achieved")
+        else:
+            if p1[0]>320:
+                currrent_pitch=currrent_pitch-2
+                angleSet(currrent_pitch,servo_pitch)
+            elif p2[0]<320:
+                currrent_pitch=currrent_pitch+2
+                angleSet(currrent_pitch,servo_pitch)
+
+        if p2[0]<240 and p2[0]>240:
+            print("Vertical target achieved")
+        else:
+            if p2[0]>240:
+                currrent_yaw=currrent_yaw+2
+                angleSet(currrent_yaw,servo_yaw)
+            elif p2[0]<240:
+                currrent_yaw=currrent_yaw-2
+                angleSet(currrent_yaw,servo_yaw)
+
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
     else:
